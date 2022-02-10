@@ -49,6 +49,9 @@ kotlin {
     }
 }
 
+// Comment this bracket and try to run `:shared:connectedAndroidTest`, it will fail to compile
+// because the dep `io.mockk:mockk` AND `io.mockk:mockk-android` are added to the same source set
+// which shouldn't append since theses deps are declared in 2 different source sets
 afterEvaluate {
     // I’ve discovered that some generated gradle configurations dedicated to `androidAndroidTest`
     // inherit from a configuration named `androidTestImplementation`. I think this conf should’t be
