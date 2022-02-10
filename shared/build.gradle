@@ -1,0 +1,78 @@
+plugins {
+    id "org.jetbrains.kotlin.multiplatform"
+    id "com.android.library"
+}
+
+group = "org.example"
+
+kotlin {
+    jvm {
+        compilations.all {
+            kotlinOptions.jvmTarget = "1.8"
+        }
+        testRuns["test"].executionTask.configure {
+            useJUnit()
+        }
+    }
+    android {
+        publishLibraryVariants("release")
+    }
+    sourceSets {
+        commonMain {
+            dependencies {
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation 'junit:junit:4.13.2'
+                implementation 'org.jetbrains.kotlin:kotlin-test'
+                implementation "io.mockk:mockk-common:$mockkVersion"
+            }
+        }
+        androidMain {
+            dependsOn(commonMain)
+            dependencies {
+            }
+        }
+        androidTest {
+            dependsOn(commonTest)
+            dependencies {
+                implementation "io.mockk:mockk:$mockkVersion"
+            }
+        }
+        androidAndroidTest {
+            dependsOn(commonTest)
+            dependencies {
+                implementation "io.mockk:mockk-android:$mockkVersion"
+            }
+        }
+    }
+}
+
+afterEvaluate {
+    // I’ve discovered that some generated gradle configurations dedicated to `androidAndroidTest`
+    // inherit from a configuration named `androidTestImplementation`. I think this conf should’t be
+    // associated to the `androidAndroidTest` confs because this conf is already used by the
+    // `androidTest` source set. If `androidTestImplementation` is not removed from the
+    // `androidAndroidTest` confs,  theses confs will try to compile code with the dependencies from
+    // the source set `androidTest` which cause a lot of issues because the `androidTest` source set
+    // is intended to run on the local JVM while `androidAndroidTest` source set run on a real
+    // device.
+    configurations.findAll { it.name.contains("AndroidTestRuntimeClasspath") || it.name.contains("AndroidTestCompileClasspath") }.forEach {
+        it.setExtendsFrom(it.extendsFrom.findAll { it.name != "androidTestImplementation" })
+    }
+}
+
+android {
+    compileSdkVersion 31
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 31
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+}
