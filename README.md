@@ -1,4 +1,4 @@
-⚠️ Bug demonstration related to https://youtrack.jetbrains.com/issue/KT-39712
+⚠️ Bug demonstration related to https://youtrack.jetbrains.com/issue/KT-51368
 
 To face the issue comment the `afterEvaluate` code block here 👇 https://github.com/VincentMasselis/androidAndroidTestBug/blob/20e22e8de860de9f5f23b2ae4f4022cae18a4ef2/shared/build.gradle#L55 and run this gradle task `:shared:connectedAndroidTest` (no need to plug a device to your computer)
 
